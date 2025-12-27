@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import router from "./app/routes";
 
 const app = express();
 
@@ -13,5 +14,7 @@ app.get("/", (req: Request, res: Response) => {
     message: "Authentication server port is running",
   });
 });
+
+app.use("/api/v1", router);
 
 export default app;
