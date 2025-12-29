@@ -41,7 +41,13 @@ const createClient = async (req: any) => {
   return result;
 };
 
+const getAllUserData = async (params: any, options: any) => {
+  const result = await prisma.user.findMany();
+  return result;
+};
+
 export const UserService = {
   createAdmin,
   createClient,
+  getAllUserData,
 };

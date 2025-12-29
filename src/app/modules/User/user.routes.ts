@@ -13,5 +13,6 @@ router.post(
 );
 
 router.post("/create-client", UserControllers.createClient);
+router.get("/", UserControllers.getAllUserData);
 
 export const UserRoutes = router;
