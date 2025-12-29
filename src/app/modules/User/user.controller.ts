@@ -16,7 +16,7 @@ import catchAsync from "../../shared/catchAsync";
 // };
 
 const createAdmin = catchAsync(async (req: Request, res: Response) => {
-  const result = await UserService.createAdmin();
+  const result = await UserService.createAdmin(req);
 
   sendResponse(res, {
     sucess: true,
