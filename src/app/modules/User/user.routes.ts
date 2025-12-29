@@ -12,4 +12,6 @@ router.post(
   // }
 );
 
+router.post("/create-client", UserControllers.createClient);
+
 export const UserRoutes = router;

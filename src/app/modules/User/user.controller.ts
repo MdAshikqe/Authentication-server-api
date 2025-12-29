@@ -21,11 +21,23 @@ const createAdmin = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     sucess: true,
     statuscode: status.OK,
-    message: "User create sucessfully",
+    message: "Admin create sucessfully",
+    data: result,
+  });
+});
+
+const createClient = catchAsync(async (req: Request, res: Response) => {
+  const result = await UserService.createClient(req);
+
+  sendResponse(res, {
+    sucess: true,
+    statuscode: status.OK,
+    message: "Cleint create successfully",
     data: result,
   });
 });
 
 export const UserControllers = {
   createAdmin,
+  createClient,
 };
