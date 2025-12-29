@@ -14,5 +14,6 @@ router.post(
 
 router.post("/create-client", UserControllers.createClient);
 router.get("/", UserControllers.getAllUserData);
+router.patch("/:id", UserControllers.updateStatusUser);
 
 export const UserRoutes = router;

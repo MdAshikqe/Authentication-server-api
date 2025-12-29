@@ -109,8 +109,25 @@ const getAllUserData = async (params: any, options: any) => {
   };
 };
 
+const updateStatusUser = async (id: any, payload: string) => {
+  await prisma.user.findUniqueOrThrow({
+    where: {
+      id: id,
+    },
+  });
+
+  const updateUserStatus = await prisma.user.update({
+    where: {
+      id: id,
+    },
+    data: payload,
+  });
+  return updateUserStatus;
+};
+
 export const UserService = {
   createAdmin,
   createClient,
   getAllUserData,
+  updateStatusUser,
 };

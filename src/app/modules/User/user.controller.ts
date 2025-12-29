@@ -56,8 +56,21 @@ const getAllUserData = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const updateStatusUser = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await UserService.updateStatusUser(id, req.body);
+
+  sendResponse(res, {
+    sucess: true,
+    statuscode: status.OK,
+    message: "User status change successfully",
+    data: result,
+  });
+});
+
 export const UserControllers = {
   createAdmin,
   createClient,
   getAllUserData,
+  updateStatusUser,
 };
