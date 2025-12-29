@@ -51,7 +51,8 @@ const getAllUserData = catchAsync(async (req: Request, res: Response) => {
     sucess: true,
     statuscode: status.OK,
     message: "User data successfully retrive",
-    data: result,
+    metaData: result.metaData,
+    data: result.data,
   });
 });
 

@@ -7,4 +7,4 @@ export const userPaginationFieldsOptions = [
   "sortOrder",
 ];
 
-export const userSearchableFields = ["email"];
+export const userSearchableFields = ["email", "role", "status"];
