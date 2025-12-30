@@ -6,6 +6,8 @@ import { prisma } from "../../lib/prisma";
 import { ILogin } from "./auth.interface";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import ApiError from "../../errors/ApiError";
+import status from "http-status";
 
 const login = async (payload: ILogin) => {
   const userData = await prisma.user.findUniqueOrThrow({
@@ -89,7 +91,40 @@ const refressToken = async (token: string) => {
   };
 };
 
+const changePassword = async (user: any, payload: any) => {
+  const userData = await prisma.user.findUniqueOrThrow({
+    where: {
+      email: user.email,
+      status: UserStatus.ACTIVE,
+    },
+  });
+
+  const isCorrectPassword = await bcrypt.compare(
+    payload.oldPassword,
+    userData.password
+  );
+
+  if (!isCorrectPassword) {
+    throw new ApiError(status.UNAUTHORIZED, "Password does not match", "");
+  }
+
+  const hashPassword = await bcrypt.hash(payload.newPassword, 10);
+  await prisma.user.update({
+    where: {
+      email: userData.email,
+    },
+    data: {
+      password: hashPassword,
+      needPasswordChange: false,
+    },
+  });
+  return {
+    message: "Successfully change password",
+  };
+};
+
 export const AuthServices = {
   login,
   refressToken,
+  changePassword,
 };
