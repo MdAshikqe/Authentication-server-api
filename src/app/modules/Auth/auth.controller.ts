@@ -24,6 +24,22 @@ const login = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const refressToken = catchAsync(async (req: Request, res: Response) => {
+  const { refressToken } = req.cookies;
+  const result = await AuthServices.refressToken(refressToken);
+
+  sendResponse(res, {
+    sucess: true,
+    statuscode: status.OK,
+    message: "Refress Token Genearate Successfully",
+    data: {
+      accessToken: result.accessToken,
+      needPasswordChange: result.needPasswordChange,
+    },
+  });
+});
+
 export const AuthControllers = {
   login,
+  refressToken,
 };
