@@ -3,6 +3,7 @@ import catchAsync from "../../shared/catchAsync";
 import { AuthServices } from "./auth.service";
 import sendResponse from "../../shared/sendResponse";
 import status from "http-status";
+import { stat } from "node:fs";
 
 const login = catchAsync(async (req: Request, res: Response) => {
   const result = await AuthServices.login(req.body);
@@ -64,9 +65,22 @@ const forgotPassword = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const resetPassword = catchAsync(async (req: Request, res: Response) => {
+  const token = req.headers.authorization || "";
+  const result = await AuthServices.resetPassword(token, req.body);
+
+  sendResponse(res, {
+    statuscode: status.OK,
+    sucess: true,
+    message: "Reset your password",
+    data: result,
+  });
+});
+
 export const AuthControllers = {
   login,
   refressToken,
   changePassword,
   forgotPassword,
+  resetPassword,
 };

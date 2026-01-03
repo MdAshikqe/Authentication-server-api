@@ -156,9 +156,41 @@ const forgotPassword = async (payload: { email: string }) => {
   );
 };
 
+const resetPassword = async (token: string, payload: any) => {
+  const userData = await prisma.user.findUniqueOrThrow({
+    where: {
+      id: payload.id,
+      status: UserStatus.ACTIVE,
+    },
+  });
+  const isValidToken = jwtHelpers.verifyToken(
+    token,
+    config.jwt.reset_pass_token_secret as string
+  );
+  if (!isValidToken) {
+    throw new ApiError(status.FORBIDDEN, "Your token is not valid", "");
+  }
+
+  const hashPassword = await bcrypt.hash(payload.password, 10);
+
+  await prisma.user.update({
+    where: {
+      id: userData.id,
+    },
+    data: {
+      password: hashPassword,
+      needPasswordChange: false,
+    },
+  });
+  return {
+    message: "Successfully Reset your password",
+  };
+};
+
 export const AuthServices = {
   login,
   refressToken,
   changePassword,
   forgotPassword,
+  resetPassword,
 };
