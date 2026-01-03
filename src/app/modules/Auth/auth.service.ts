@@ -1,5 +1,5 @@
 import { Secret } from "jsonwebtoken";
-import { UserStatus } from "../../../../generated/prisma/enums";
+import { UserRole, UserStatus } from "../../../../generated/prisma/enums";
 import config from "../../config";
 import { jwtHelpers } from "../../helpers/jwtHelper";
 import { prisma } from "../../lib/prisma";
@@ -8,6 +8,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import ApiError from "../../errors/ApiError";
 import status from "http-status";
+import emailSender from "./emailSender";
 
 const login = async (payload: ILogin) => {
   const userData = await prisma.user.findUniqueOrThrow({
@@ -123,8 +124,41 @@ const changePassword = async (user: any, payload: any) => {
   };
 };
 
+const forgotPassword = async (payload: { email: string }) => {
+  const userData = await prisma.user.findUniqueOrThrow({
+    where: {
+      email: payload.email,
+      status: UserStatus.ACTIVE,
+    },
+  });
+
+  const resetPassToken = jwtHelpers.generateToken(
+    {
+      email: userData.email,
+      role: userData.role,
+    },
+    config.jwt.reset_pass_token_secret as Secret,
+    config.jwt.reset_pass_token_expireIn as string
+  );
+  //rest password link
+  const restPasswordLink =
+    config.reset_pass_link + `?id=${userData.id}&token=${resetPassToken}`;
+  console.log(restPasswordLink);
+
+  await emailSender(
+    userData.email,
+    `<div style="font-family: Arial, sans-serif; padding: 20px;">
+          <h2 style="color: #4CAF50;">Hello, Welcome to Our Service!</h2>
+          <p>Please reset password in and change your password for security.</p>
+          <a href=${restPasswordLink} style="background: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;"><button>Reset Password</button></a>
+          <p>Best Regards,<br> Your Team</p>
+        </div>`
+  );
+};
+
 export const AuthServices = {
   login,
   refressToken,
   changePassword,
+  forgotPassword,
 };
