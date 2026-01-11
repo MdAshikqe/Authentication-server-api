@@ -68,9 +68,21 @@ const updateStatusUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getMyProfile = catchAsync(async (req: Request, res: Response) => {
+  const result = await UserService.getMyProfile();
+
+  sendResponse(res, {
+    statuscode: status.OK,
+    sucess: true,
+    message: "Successfully get my profile",
+    data: result,
+  });
+});
+
 export const UserControllers = {
   createAdmin,
   createClient,
   getAllUserData,
   updateStatusUser,
+  getMyProfile,
 };

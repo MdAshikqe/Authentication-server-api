@@ -135,9 +135,14 @@ const updateStatusUser = async (id: any, payload: string) => {
   return updateUserStatus;
 };
 
+const getMyProfile = async () => {
+  console.log("get my profile");
+};
+
 export const UserService = {
   createAdmin,
   createClient,
   getAllUserData,
   updateStatusUser,
+  getMyProfile,
 };

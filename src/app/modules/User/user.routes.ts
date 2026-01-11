@@ -29,5 +29,6 @@ router.post(
 );
 router.get("/", UserControllers.getAllUserData);
 router.patch("/:id", UserControllers.updateStatusUser);
+router.get("/get-my-profile", UserControllers.getMyProfile);
 
 export const UserRoutes = router;
