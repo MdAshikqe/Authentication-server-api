@@ -4,8 +4,14 @@ import { PaginationHelper } from "../../helpers/paginationHelpers";
 import { prisma } from "../../lib/prisma";
 import bcrypt from "bcrypt";
 import { userSearchableFields } from "./user.constant";
+import { fileUploaders } from "../../helpers/fileUploader";
 
 const createAdmin = async (req: any) => {
+  if (req.file) {
+    const uploadResult = await fileUploaders.uploadToCloudinary(req.file);
+    req.body.admin.profilePhoto = uploadResult?.secure_url;
+  }
+
   const hashPassword: string = await bcrypt.hash(req.body.password, 12);
   const userData = {
     email: req.body.admin.email,
@@ -25,6 +31,10 @@ const createAdmin = async (req: any) => {
 };
 
 const createClient = async (req: any) => {
+  if (req.file) {
+    const uploadResult = await fileUploaders.uploadToCloudinary(req.file);
+    req.body.client.profilePhoto = uploadResult?.secure_url;
+  }
   const hashPassword: string = await bcrypt.hash(req.body.password, 12);
   const userData = {
     email: req.body.client.email,
