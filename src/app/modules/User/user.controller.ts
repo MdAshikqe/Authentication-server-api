@@ -8,6 +8,7 @@ import {
   userFilterAbleFields,
   userPaginationFieldsOptions,
 } from "./user.constant";
+import { IAuthUser } from "../../interface/common";
 
 // const createAdmin = async (req: Request, res: Response) => {
 //   const result = await UserService.createAdmin();
@@ -68,16 +69,19 @@ const updateStatusUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const getMyProfile = catchAsync(async (req: Request, res: Response) => {
-  const result = await UserService.getMyProfile();
+const getMyProfile = catchAsync(
+  async (req: Request & { user?: IAuthUser }, res: Response) => {
+    const user = req.user;
+    const result = await UserService.getMyProfile(user as IAuthUser);
 
-  sendResponse(res, {
-    statuscode: status.OK,
-    sucess: true,
-    message: "Successfully get my profile",
-    data: result,
-  });
-});
+    sendResponse(res, {
+      statuscode: status.OK,
+      sucess: true,
+      message: "Successfully get my profile",
+      data: result,
+    });
+  }
+);
 
 export const UserControllers = {
   createAdmin,

@@ -5,6 +5,7 @@ import { prisma } from "../../lib/prisma";
 import bcrypt from "bcrypt";
 import { userSearchableFields } from "./user.constant";
 import { fileUploaders } from "../../helpers/fileUploader";
+import { IAuthUser } from "../../interface/common";
 
 const createAdmin = async (req: any) => {
   if (req.file) {
@@ -135,8 +136,50 @@ const updateStatusUser = async (id: any, payload: string) => {
   return updateUserStatus;
 };
 
-const getMyProfile = async () => {
-  console.log("get my profile");
+const getMyProfile = async (user: IAuthUser) => {
+  const userInfo = await prisma.user.findUniqueOrThrow({
+    where: {
+      email: user?.email as string,
+    },
+    select: {
+      id: true,
+      email: true,
+      role: true,
+      needPasswordChange: true,
+      status: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+
+  let profileInfo;
+
+  if (userInfo.role === UserRole.ADMIN) {
+    profileInfo = await prisma.admin.findUniqueOrThrow({
+      where: {
+        email: userInfo.email,
+      },
+    });
+  }
+
+  if (userInfo.role === UserRole.CLIENT) {
+    profileInfo = await prisma.client.findUniqueOrThrow({
+      where: {
+        email: userInfo.email,
+      },
+    });
+  } else if (userInfo.role === UserRole.SUPER_ADMIN) {
+    profileInfo = await prisma.admin.findUniqueOrThrow({
+      where: {
+        email: userInfo.email,
+      },
+    });
+  }
+
+  return {
+    ...userInfo,
+    ...profileInfo,
+  };
 };
 
 export const UserService = {
