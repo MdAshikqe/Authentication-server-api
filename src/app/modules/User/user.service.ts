@@ -6,6 +6,8 @@ import bcrypt from "bcrypt";
 import { userSearchableFields } from "./user.constant";
 import { fileUploaders } from "../../helpers/fileUploader";
 import { IAuthUser } from "../../interface/common";
+import { Request } from "express";
+import { userValidation } from "./user.validation";
 
 const createAdmin = async (req: any) => {
   if (req.file) {
@@ -182,10 +184,51 @@ const getMyProfile = async (user: IAuthUser) => {
   };
 };
 
+const updateMyProfile = async (user: IAuthUser, req: Request) => {
+  const userInfo = await prisma.user.findUniqueOrThrow({
+    where: {
+      email: user?.email as string,
+    },
+  });
+
+  if (req.file) {
+    const uploadResult = await fileUploaders.uploadToCloudinary(req.file);
+    req.body.profilePhoto = uploadResult?.secure_url;
+  }
+
+  let profileInfo;
+
+  if (userInfo.role === UserRole.ADMIN) {
+    profileInfo = await prisma.admin.update({
+      where: {
+        email: userInfo.email,
+      },
+      data: req.body,
+    });
+  } else if (userInfo.role === UserRole.CLIENT) {
+    profileInfo = await prisma.client.update({
+      where: {
+        email: userInfo.email,
+      },
+      data: req.body,
+    });
+  } else if (userInfo.role === UserRole.SUPER_ADMIN) {
+    profileInfo = await prisma.admin.update({
+      where: {
+        email: userInfo.email,
+      },
+      data: req.body,
+    });
+  }
+  return {
+    ...profileInfo,
+  };
+};
 export const UserService = {
   createAdmin,
   createClient,
   getAllUserData,
   updateStatusUser,
   getMyProfile,
+  updateMyProfile,
 };

@@ -1,7 +1,6 @@
 import express, { NextFunction, Request, Response } from "express";
 import { UserControllers } from "./user.controller";
 import { userValidation } from "./user.validation";
-import validateRequest from "../../middleware/validateRequest";
 import { fileUploaders } from "../../helpers/fileUploader";
 import auth from "../../middleware/auth";
 import { UserRole } from "../../../../generated/prisma/enums";
@@ -35,6 +34,15 @@ router.get(
   "/get-my-profile",
   auth(UserRole.ADMIN, UserRole.CLIENT, UserRole.SUPER_ADMIN),
   UserControllers.getMyProfile
+);
+router.put(
+  "/update-my-profile",
+  auth(UserRole.ADMIN, UserRole.CLIENT, UserRole.SUPER_ADMIN),
+  fileUploaders.upload.single("file"),
+  (req: Request, res: Response, next: NextFunction) => {
+    req.body = JSON.parse(req.body.data);
+    return UserControllers.updateMyProfile(req, res, next);
+  }
 );
 
 export const UserRoutes = router;
